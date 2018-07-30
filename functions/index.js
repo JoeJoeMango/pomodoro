@@ -6,7 +6,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 const timer = {
   pomodoro: {
-    minutes: 25,
+    minutes: 5,
     timer: null,
     message: ""
   },
@@ -26,25 +26,38 @@ const fullCycle = [
   timer.pomodoro.minutes * 1000,
   timer.shortBreak.minutes * 1000,
   timer.pomodoro.minutes * 1000,
+  timer.shortBreak.minutes * 1000,
+  timer.pomodoro.minutes * 1000,
+  timer.shortBreak.minutes * 1000,
+  timer.pomodoro.minutes * 1000,
   timer.longBreak.minutes * 1000,
-  timer.pomodoro.minutes * 1000
+
 ];
 
 let cycleIndex = 0;
+let pomCycle = 1;
 let cycleLength = fullCycle.length;
 
 const execTimer = () => {
   console.log("executing timer", cycleIndex);
 
-  if (cycleIndex > cycleLength - 1) {
+  if (cycleIndex > cycleLength) {
     console.log("done with pomodoro cycle");
     cycleIndex = 0;
   } else {
     setTimeout(() => {
-      console.log("resetting timer");
+      if(cycleIndex == 1 || cycleIndex == 3 || cycleIndex == 5 || cycleIndex == 7){
+        console.log("pomodoro" + pomCycle + "finished, starting short Break");
+      }else if (cycleIndex == 9){
+      console.log("long break");
+    }else {
+      console.log("break finished starting pomodoro");
+    }
+
       execTimer();
     }, fullCycle[cycleIndex]);
     cycleIndex++;
+    pomCycle++;
   }
 };
 
@@ -66,10 +79,8 @@ app.put("/", function(req, res) {
 
 app.get("/start-timer", function(req, res) {
   console.log("starting timer params", req.body);
-
   cycleIndex = 0;
   execTimer();
-
   res.json(timer);
 });
 
